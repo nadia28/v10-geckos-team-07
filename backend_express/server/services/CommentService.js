@@ -1,36 +1,38 @@
-const fs = require('fs');
+const connection = require('../lib/db');
 const util = require('util');
 
-const writeFile = util.promisify(fs.writeFile);
-const readFile = util.promisify(fs.readFile);
+const dbRead = util.promisify(connection.query).bind(connection);
 
 class CommentService {
-  constructor(dataFile) {
-    this.dataFile = dataFile;
-  }
-
+ // add comments
   async addComment(newComment) {
+    let existingUser = await this.getUser(newUser.email);
+    if(!existingUser) {
+      throw Error('Please login to write a comment');
+    }
 
-    const commentsArray = await this.getData();
-
-    commentsArray.unshift({
-      name: newComment.name,
-      email: newComment.email,
-      message: newComment.message
-    });
-
-    await writeFile(this.dataFile, JSON.stringify(commentsArray));
+    const query = `insert into comments(Name, Body) values ('${newComment.name}', '${newComment.body}');`
+    await dbQuery(query);
   }
 
+
+  // show all comments for a particular room
   async getAllComments() {
     const allCommentsArray = await this.getData();
-    return allCommentsArray;
+    return allCommentsArray.map((comment) => {
+      return {user: user.Name, body: comment.body};
+    })
   }
 
   async getData() {
-    const data = await readFile(this.dataFile, 'utf8');
-    if (!data) return [];
-    return JSON.parse(data);
+    const query = `select u.name, c.body
+    from comments c
+    join users u on c.userID = u.id`;
+    
+    const rows = await dbQuery(query);
+    const data = JSON.parse(JSON.stringify(rows));
+    console.log(`Fetched ${data.length} comments data from DB.`);
+    return data;
   }
 }
 

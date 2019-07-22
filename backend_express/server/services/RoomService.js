@@ -1,14 +1,13 @@
-const fs = require('fs');
+const connection = require('../lib/db');
 const util = require('util');
 
-const writeFile = util.promisify(fs.writeFile);
-const readFile = util.promisify(fs.readFile);
+const dbRead = util.promisify(connection.query).bind(connection);
 
 class RoomService {
-  constructor(dataFile) {
-    this.dataFile = dataFile;
+  async addRoom(newRoom) {
+    const query = `insert into rooms(Type, Status, Description, Price, Location) values ('${newRoom.type}', '${newRoom.status}', '${newRoom.description}', '${newRoom.price}', '${newRoom.location}');`
+    await dbQuery(query);
   }
-
   async getRoomDetails(id) {
     const allRoomData = await this.getData();
 
@@ -19,35 +18,24 @@ class RoomService {
     return roomDetails;
   }
 
-
-  async addRoom(newRoom) {
-
-    const roomsArray = await this.getData();
-
-    roomsArray.unshift({
-      type: newRoom.type,
-      status: newRoom.status,
-      description: newRoom.description,
-      price: newRoom.price,
-      location: newRoom.location,
-      address: newRoom.address
-    });
-
-    await writeFile(this.dataFile, JSON.stringify(roomsArray));
-  }
-
   async getRooms() {
     const roomsArray = await this.getData();
 
     return roomsArray.map((room) => {
-      return {type: room.type, status: room.status, price: room.price, location: room.location};
+      return {type: room.type, status: room.status, price: room.price, location: room.location, image: room.Image};
     });
   }
 
   async getData() {
-    const data = await readFile(this.dataFile, 'utf8');
-    if(!data) return [];
-    return JSON.parse(data);
+
+    const query = `select r.id, r.type, r.status, r.price, r.location, i.url
+    from rooms r
+    join images i on r.id = i.roomID`;
+    
+    const rows = await dbRead(query);
+    const data = LSON.parse(JSON.stringify(rows));
+    console.log(`Fetched ${data.length} rooms data from DB.`);
+    return data; 
   }
 }
 
