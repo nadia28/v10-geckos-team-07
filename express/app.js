@@ -6,7 +6,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const routes = require('./routes/index.js');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // view engine setup
 app.locals.pretty = true;
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-app.use('/', routes());
+app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,3 +45,4 @@ app.listen(port, function(){
   console.log('Web server started on port ' + port);
 });
 
+module.exports = app;
