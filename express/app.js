@@ -6,7 +6,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const routes = require('./routes/index.js');
 const app = express();
-const port = 3001;
+const port = 3000;
 
 // view engine setup
 app.locals.pretty = true;
