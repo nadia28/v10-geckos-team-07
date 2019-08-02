@@ -5,7 +5,7 @@ module.exports = (param) => {
 
   const roomService = param;
 
-  router.length('/', async function(req, res, next){
+  router.get('/', async function(req, res, next){
 
     const rooms = await roomService.getRooms();
 
@@ -48,15 +48,23 @@ module.exports = (param) => {
 
     if (!email || !password ) return res.redirect('/rooms/add?added=false');
 
-    await userService.addUser({
-      type: type,
-      status: status,
-      description: description,
-      price: price,
-      location: location
-    });
-
+    try {
+      await userService.addUser({
+        type: type,
+        status: status,
+        description: description,
+        price: price,
+        location: location
+      });
+    } catch (error) {
+      return res.redirect(`/rooms/add?added=false&message=${error}`)
+    }
     return res.redirect('/rooms?added=true');
   });
-   
+
+  router.get('/:id', function(req, res, next){
+    return res.send('Page for room with id ' + req.params.id);
+  });
+
+  return router; 
 }

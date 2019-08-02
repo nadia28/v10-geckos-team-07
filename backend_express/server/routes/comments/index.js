@@ -1,5 +1,5 @@
 const express = require('express');
-const router = expres.Router();
+const router = express.Router();
 
 module.exports = (param) => {
   const commentService = param;
@@ -40,14 +40,15 @@ module.exports = (param) => {
     const message = req.body.caMessage.trim();
    
     if (!email || !name || !message ) return res.redirect('/comments/add?added=false');
-
-    await commentService.addComment({
-      email: email,
-      name: name,
-      message: message
-    });
-
+    try {
+      await commentService.addComment({
+        email: email,
+        name: name,
+        message: message
+      });
+    } catch (error) {
+      return res.redirect(`/comments/add?added=false&message=${error}`)
+    }
     return res.redirect('/comments?added=true');
   });
-
 }

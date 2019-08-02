@@ -46,15 +46,19 @@ module.exports = (param) => {
 
     if(!email || !password) return res.redirect('/users/add?added=false');
 
-    await userService.addUser({
-      name: name,
-      lastName: lastName,
-      email: email,
-      password: password,
-      address: address,
-      birthday: birthday
-    });
-
+    try {
+      await userService.addUser({
+        name: name,
+        lastName: lastName,
+        email: email,
+        password: password,
+        address: address,
+        birthday: birthday
+      });
+    } catch (error) {
+      return res.redirect(`/users/add?added=false&message=${error}`)
+    }
+   
     return res.redirect('/users?added=true');
   });
 
