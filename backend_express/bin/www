@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../server/index.js');
+var app = require('../app');
 var debug = require('debug')('backend-express:server');
 var http = require('http');
 
